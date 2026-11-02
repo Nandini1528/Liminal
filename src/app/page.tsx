@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import footerMsg from "../components/footermsg.png";
 import line from "../components/line.png";
 import logo from "../components/logo.svg";
 import mainPaper from "../components/main.png";
@@ -9,6 +8,7 @@ import pin from "../components/pin.png";
 import polaroid from "../components/polaroid.png";
 import reminder from "../components/reminder.png";
 import navline from "../components/navline.png";
+import Footer from "@/components/Footer";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -17,17 +17,58 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   const traceHref = user ? "/journal" : "/login";
+  const entriesHref = user ? "/entries" : "/login";
+  const collectionHref = user ? "/collection" : "/login";
+
+  const displayName =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email?.split("@")[0] ??
+    "";
+
+  const authButton =
+    "flex h-10 items-center justify-center rounded-[9px] bg-[#2A2B2B] px-4 text-[16px] text-white shadow-sm transition hover:bg-[#812121]";
 
   return (
-    <section className="relative flex min-h-[90vh] w-full flex-col overflow-hidden bg-white px-5 text-[#2A2B2B] sm:px-8">
+    <section className="relative flex flex-1 flex-col overflow-hidden bg-white px-5 text-[#2A2B2B] sm:px-8">
+      {/* Auth status (top right) */}
+      <div className="absolute right-5 top-5 z-40 flex items-center gap-3 sm:right-8 sm:top-6">
+        {user ? (
+          <>
+            <span className="hidden items-center gap-2 text-[16px] text-[#2A2B2B]/80 sm:flex">
+              <span
+                aria-hidden="true"
+                className="h-2 w-2 rounded-full bg-green-500"
+              />
+              {displayName}
+            </span>
+            <form action="/logout" method="post">
+              <button type="submit" className={authButton}>
+                Log out
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="flex h-10 items-center justify-center rounded-[9px] border border-[#2A2B2B] px-4 text-[16px] text-[#2A2B2B] transition hover:bg-[#2A2B2B] hover:text-white"
+            >
+              Log in
+            </Link>
+            <Link href="/signup" className={authButton}>
+              Sign up
+            </Link>
+          </>
+        )}
+      </div>
+
       <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8">
         <nav
           aria-label="Primary navigation"
           className="mx-auto flex w-full max-w-4xl items-center justify-center gap-10 py-6 text-[16px] text-[#2A2B2B] sm:gap-16"
         >
-          
-          <a
-            href="#home"
+          <Link
+            href="/"
             className="inline-flex h-5 w-12.25 items-center"
             aria-label="Liminal home"
           >
@@ -38,13 +79,16 @@ export default async function Home() {
               className="h-5 w-auto"
               sizes="49px"
             />
-          </a>
-          <a href="#calendar" className="transition hover:text-[#812121]">
-            Calendar
-          </a>
-          <a href="#entries" className="transition hover:text-[#812121]">
+          </Link>
+          <Link href={entriesHref} className="transition hover:text-[#812121]">
             Entries
-          </a>
+          </Link>
+          <Link
+            href={collectionHref}
+            className="transition hover:text-[#812121]"
+          >
+            Collection
+          </Link>
         </nav>
         <div className="mx-auto mb-4 flex w-full justify-center">
           <Image
@@ -118,16 +162,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-
-      <footer className="mx-auto mt-24 flex w-full max-w-3xl flex-col items-center gap-2 pb-7 text-center text-lg text-[#9E9892]">
-        <Image
-          src={footerMsg}
-          alt=""
-          className="h-auto w-16 select-none"
-          sizes="64px"
-        />
-        <p>Copyright © 2026 Liminal. All rights reserved.</p>
-      </footer>
+      <Footer />
     </section>
   );
 }

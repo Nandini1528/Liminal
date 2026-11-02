@@ -6,6 +6,7 @@ const schoolbell = Schoolbell({
   variable: "--font-schoolbell",
   weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -19,8 +20,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${schoolbell.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${schoolbell.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-screen flex-col">
+        {children}
+      </body>
     </html>
   );
 }
